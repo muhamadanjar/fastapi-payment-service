@@ -2,4 +2,4 @@
 from infrastructure.database.connections import MultiDatabaseManager
 
 
-db_manager = MultiDatabaseManager()
+database_manager = MultiDatabaseManager()

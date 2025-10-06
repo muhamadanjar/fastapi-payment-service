@@ -4,6 +4,8 @@ from typing import Optional
 from enum import Enum
 import uuid
 
+from app.domain.entity.enums import AdminFeeType, GatewayType, MethodType
+
 class PaymentMethod(SQLModel, table=True):
     __tablename__ = "payment_methods"
     
@@ -40,7 +42,7 @@ class PaymentGatewayCredential(SQLModel, table=True):
     __tablename__ = "payment_gateway_credentials"
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
-    application_id: str = Field(foreign_key="applications.id", max_length=36, index=True)
+    application_id: str = Field(max_length=36, index=True)
     gateway_id: str = Field(foreign_key="payment_gateways.id", max_length=36, index=True)
     merchant_id: Optional[str] = Field(default=None, max_length=255)
     api_key: Optional[str] = Field(default=None, max_length=500)

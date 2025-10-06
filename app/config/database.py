@@ -18,10 +18,11 @@ class DatabaseSettings(BaseSettings):
     """Database configuration from environment variables"""
     
     model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
+        # env_file=".env",
+        # env_file_encoding="utf-8",
         case_sensitive=False,
-        extra="ignore"
+        extra="ignore",
+        env_prefix="DB_"
     )
     
     # Primary Database
@@ -29,8 +30,8 @@ class DatabaseSettings(BaseSettings):
     db_host: str = Field(default=os.environ.get("DB_HOST"), description="Database host", env="DB_HOST")
     db_port: int = Field(default=5432, description="Database port")
     db_user: str = Field(default=os.environ.get('DB_USER'), description="Database username")
-    db_password: str = Field(default="", description="Database password")
-    db_name: str = Field(default="payment_system", description="Database name")
+    db_password: str = Field(default=os.environ.get('DB_PASSWORD'), description="Database password")
+    db_name: str = Field(default=os.environ.get('DB_NAME'), description="Database name")
     
     # SQLite specific
     db_path: Optional[str] = Field(default=None, description="SQLite database path")

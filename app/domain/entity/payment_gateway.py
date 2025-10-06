@@ -4,6 +4,8 @@ from typing import Optional
 from enum import Enum
 import uuid
 
+from app.domain.entity.enums import CallbackType, RequestType
+
 class PaymentGatewayRequest(SQLModel, table=True):
     __tablename__ = "payment_gateway_requests"
     

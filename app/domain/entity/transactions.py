@@ -4,12 +4,14 @@ from typing import Optional
 from enum import Enum
 import uuid
 
+from app.domain.entity.enums import ChangedBy, TransactionStatus
+
 
 class Transaction(SQLModel, table=True):
     __tablename__ = "transactions"
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
-    application_id: str = Field(foreign_key="applications.id", max_length=36, index=True)
+    application_id: str = Field(max_length=36, index=True)
     user_id: str = Field(max_length=36, index=True)
     transaction_code: str = Field(unique=True, max_length=100, index=True)
     invoice_number: str = Field(unique=True, max_length=100, index=True)
@@ -30,7 +32,7 @@ class Transaction(SQLModel, table=True):
     paid_at: Optional[datetime] = None
     expired_at: Optional[datetime] = None
     notes: Optional[str] = None
-    metadata: Optional[dict] = Field(default=None, sa_column=Column(JSON))
+    extra_data: Optional[dict] = Field(default=None, sa_column=Column(JSON))
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -46,7 +48,7 @@ class TransactionItem(SQLModel, table=True):
     quantity: int = Field(gt=0)
     unit_price: float = Field(ge=0)
     subtotal: float = Field(ge=0)
-    metadata: Optional[dict] = Field(default=None, sa_column=Column(JSON))
+    item_metadata: Optional[dict] = Field(default=None, sa_column=Column(JSON))
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -60,5 +62,5 @@ class TransactionLog(SQLModel, table=True):
     changed_by: ChangedBy
     gateway_callback_id: Optional[str] = Field(default=None, foreign_key="payment_gateway_callbacks.id", max_length=36)
     notes: Optional[str] = None
-    metadata: Optional[dict] = Field(default=None, sa_column=Column(JSON))
+    log_metadata: Optional[dict] = Field(default=None, sa_column=Column(JSON))
     created_at: datetime = Field(default_factory=datetime.utcnow)

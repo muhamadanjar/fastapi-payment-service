@@ -18,8 +18,8 @@ class Settings(BaseSettings):
     VERSION: str = Field(default="1.0.0")
     DESCRIPTION: str = "FastAPI payment"
 
-    DATABASE: Optional[DatabaseSettings] = Field(default=None, default_factory=DatabaseSettings)
-    CORS:Optional[CORSSettings] = Field(default=None, default_factory=CORSSettings)
+    DATABASE: DatabaseSettings = Field(default_factory=DatabaseSettings)
+    CORS:Optional[CORSSettings] = Field(default=None,)
 
     model_config = SettingsConfigDict(
         env_file=str(BASE_DIR / ".env"), 

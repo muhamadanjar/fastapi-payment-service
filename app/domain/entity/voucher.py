@@ -10,7 +10,7 @@ class Voucher(SQLModel, table=True):
     __tablename__ = "vouchers"
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
-    application_id: str = Field(foreign_key="applications.id", max_length=36, index=True)
+    application_id: str = Field(max_length=36, index=True)
     voucher_code: str = Field(unique=True, max_length=100, index=True)
     voucher_name: str = Field(max_length=255)
     description: Optional[str] = None
@@ -50,7 +50,7 @@ class VoucherEligibleUser(SQLModel, table=True):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
     voucher_id: str = Field(foreign_key="vouchers.id", max_length=36, index=True)
     user_id: str = Field(max_length=36, index=True)
-    application_id: str = Field(foreign_key="applications.id", max_length=36, index=True)
+    application_id: str = Field(max_length=36, index=True)
     eligible_at: datetime = Field(default_factory=datetime.utcnow)
     notified_at: Optional[datetime] = None
     expires_at: Optional[datetime] = None
@@ -64,7 +64,7 @@ class VoucherUsage(SQLModel, table=True):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
     voucher_id: str = Field(foreign_key="vouchers.id", max_length=36, index=True)
     user_id: str = Field(max_length=36, index=True)
-    application_id: str = Field(foreign_key="applications.id", max_length=36, index=True)
+    application_id: str = Field(max_length=36, index=True)
     transaction_id: str = Field(foreign_key="transactions.id", max_length=36, index=True)
     used_at: datetime = Field(default_factory=datetime.utcnow)
 

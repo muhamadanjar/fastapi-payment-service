@@ -6,9 +6,19 @@ from sqlmodel import SQLModel, create_engine
 from alembic import context
 
 from app.config.config import get_settings
+from app.config.database import DatabaseSettings
 
-
+db = DatabaseSettings()
 settings = get_settings()
+
+
+from app.domain.entity.payment_gateway import *
+from app.domain.entity.payments import *
+from app.domain.entity.product import *
+from app.domain.entity.transactions import *
+from app.domain.entity.voucher import *
+
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -30,9 +40,13 @@ target_metadata = SQLModel.metadata
 # ... etc.
 
 def get_url() -> str:
-    url = settings.DATABASE.get_primary_url()
+    url = "" ##config.get_main_option('sqlalchemy.url')
+    if settings.DATABASE:
+        url = settings.DATABASE.get_primary_url()
     if not url:
         raise ValueError("database url is not set")
+    
+    print("URL", url, db.get_primary_url())
     return url
 
 def run_migrations_offline() -> None:

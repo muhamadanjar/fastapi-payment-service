@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import (
 from sqlmodel import SQLModel, create_engine, Session
 from sqlalchemy.orm import sessionmaker
 from app.core.exceptions import DatabaseError
-from config.database import DatabaseConfig, DatabaseType
+from app.config.database import  DatabaseType
 from sqlalchemy.pool import QueuePool, NullPool
 from contextlib import asynccontextmanager, contextmanager
 import logging

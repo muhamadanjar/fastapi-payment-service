@@ -4,6 +4,8 @@ from typing import Optional
 from enum import Enum
 import uuid
 
+from app.domain.entity.enums import ConditionType, DiscountType, OperatorType, VoucherType
+
 class Voucher(SQLModel, table=True):
     __tablename__ = "vouchers"
     

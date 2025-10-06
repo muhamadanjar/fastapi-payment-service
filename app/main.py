@@ -3,8 +3,7 @@ import logging
 from fastapi import FastAPI, Depends
 from sqlmodel import Session, select
 from app.infrastructure.database import on_shutdown, on_startup, setup_from_settings
-from domain.entity.product import Product
-
+from app.interfaces.http.routes import api_router as app_router
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -37,3 +36,5 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+app.include_router(app_router)

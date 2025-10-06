@@ -1,5 +1,6 @@
 
 from enum import Enum
+import os
 from typing import Generator, Optional, Dict
 
 from pydantic import Field, field_validator
@@ -24,10 +25,10 @@ class DatabaseSettings(BaseSettings):
     )
     
     # Primary Database
-    db_type: DatabaseType = Field(default=DatabaseType.POSTGRESQL, description="Database type")
-    db_host: str = Field(default="localhost", description="Database host")
+    db_type: DatabaseType = Field(default=DatabaseType.POSTGRESQL, description="Database type", env="DB_TYPE")
+    db_host: str = Field(default=os.environ.get("DB_HOST"), description="Database host", env="DB_HOST")
     db_port: int = Field(default=5432, description="Database port")
-    db_user: str = Field(default="postgres", description="Database username")
+    db_user: str = Field(default=os.environ.get('DB_USER'), description="Database username")
     db_password: str = Field(default="", description="Database password")
     db_name: str = Field(default="payment_system", description="Database name")
     

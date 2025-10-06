@@ -1,8 +1,16 @@
 from functools import lru_cache
 from typing import Optional
 from pydantic import EmailStr, Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from app.config.cors import CORSSettings
 from .database import DatabaseSettings
+from pathlib import Path
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+print("BASE DIR", BASE_DIR)
 
 class Settings(BaseSettings):
     # Project
@@ -10,9 +18,16 @@ class Settings(BaseSettings):
     VERSION: str = Field(default="1.0.0")
     DESCRIPTION: str = "FastAPI payment"
 
-    DATABASE: Optional[DatabaseSettings] = Field(default=None, efault_factory=DatabaseSettings)
+    DATABASE: Optional[DatabaseSettings] = Field(default=None, default_factory=DatabaseSettings)
+    CORS:Optional[CORSSettings] = Field(default=None, default_factory=CORSSettings)
 
+    model_config = SettingsConfigDict(
+        env_file=str(BASE_DIR / ".env"), 
+        extra="allow", 
+        env_file_encoding="utf-8"
+    )
 
+settings = Settings()
 
 @lru_cache
 def get_settings() -> Settings:

@@ -1,19 +1,18 @@
-#product_reposotory.py
-from datetime import datetime
+
 from typing import List, Optional, Union
-from uuid import UUID
-from app.domain.entity.product import Product
+from sqlmodel import Session, select
+from app.domain.entity.transactions import Transaction
 from app.domain.repository.base import BaseRepository
 from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlmodel import Session, select
+from datetime import datetime
 
-class ProductRepository(BaseRepository[Product]):
 
+class TransactionRepository(BaseRepository[Transaction]):
     def __init__(self, session: Union[Session, AsyncSession]):
         super().__init__(session)
-        self.model = Product
-
-    def create(self, entity: Product) -> Product:
+        self.model = Transaction
+    
+    def create(self, entity: Transaction) -> Transaction:
         """Sync create product"""
         if self._is_async():
             raise RuntimeError("Cannot use sync method with AsyncSession. Use create_async() instead.")
@@ -23,25 +22,26 @@ class ProductRepository(BaseRepository[Product]):
         self.session.refresh(entity)
         return entity
 
-    def get_by_id(self, id: str) -> Optional[Product]:
+    def get_by_id(self, id: str) -> Optional[Transaction]:
         """Sync get product by id"""
         if self._is_async():
             raise RuntimeError("Cannot use sync method with AsyncSession. Use get_by_id_async() instead.")
         
-        statement = select(Product).where(Product.id == id)
+        statement = select(Transaction).where(Transaction.id == id)
         result = self.session.exec(statement)
         return result.first()
     
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[Product]:
+
+    def get_all(self, skip: int = 0, limit: int = 100) -> List[Transaction]:
         """Sync get all products"""
         if self._is_async():
             raise RuntimeError("Cannot use sync method with AsyncSession. Use get_all_async() instead.")
         
-        statement = select(Product).offset(skip).limit(limit)
+        statement = select(Transaction).offset(skip).limit(limit)
         result = self.session.exec(statement)
         return result.all()
-    
-    def update(self, id: str, entity: Union[Product, dict]) -> Optional[Product]:
+
+    def update(self, id: str, entity: Union[Transaction, dict]) -> Optional[Transaction]:
         """Sync update product"""
         if self._is_async():
             raise RuntimeError("Cannot use sync method with AsyncSession. Use update_async() instead.")
@@ -72,8 +72,9 @@ class ProductRepository(BaseRepository[Product]):
             self.session.rollback()
             raise e
 
+
     def delete(self, id: str) -> bool:
-        """Sync delete product"""
+        """Sync delete transaction"""
         if self._is_async():
             raise RuntimeError("Cannot use sync method with AsyncSession. Use delete_async() instead.")
         
@@ -85,9 +86,7 @@ class ProductRepository(BaseRepository[Product]):
         self.session.commit()
         return True
     
-    # ==================== ASYNC METHODS ====================
-
-    async def create_async(self, entity: Product) -> Product:
+    async def create_async(self, entity: Transaction) -> Transaction:
         """Async create product"""
         if not self._is_async():
             raise RuntimeError("Cannot use async method with sync Session. Use create() instead.")
@@ -97,25 +96,25 @@ class ProductRepository(BaseRepository[Product]):
         await self.session.refresh(entity)
         return entity
 
-    async def get_by_id_async(self, id: UUID) -> Optional[Product]:
+    async def get_by_id_async(self, id: str) -> Optional[Transaction]:
         """Async get product by id"""
         if not self._is_async():
             raise RuntimeError("Cannot use async method with sync Session. Use get_by_id() instead.")
         
-        statement = select(Product).where(Product.id == id)
+        statement = select(Transaction).where(Transaction.id == id)
         result = await self.session.execute(statement)
         return result.scalar_one_or_none()
     
-    async def get_all_async(self, skip: int = 0, limit: int = 100) -> List[Product]:
+    async def get_all_async(self, skip: int = 0, limit: int = 100) -> List[Transaction]:
         """Async get all products"""
         if not self._is_async():
             raise RuntimeError("Cannot use async method with sync Session. Use get_all() instead.")
         
-        statement = select(Product).offset(skip).limit(limit)
+        statement = select(Transaction).offset(skip).limit(limit)
         result = await self.session.execute(statement)
         return result.scalars().all()
     
-    async def update_async(self, id: UUID, entity: Union[Product, dict]) -> Optional[Product]:
+    async def update_async(self, id: str, entity: Union[Transaction, dict]) -> Optional[Transaction]:
         """Async update product"""
         if not self._is_async():
             raise RuntimeError("Cannot use async method with sync Session. Use update() instead.")
@@ -146,7 +145,7 @@ class ProductRepository(BaseRepository[Product]):
             await self.session.rollback()
             raise e
 
-    async def delete_async(self, id: UUID) -> bool:
+    async def delete_async(self, id: str) -> bool:
         """Async delete product"""
         if not self._is_async():
             raise RuntimeError("Cannot use async method with sync Session. Use delete() instead.")
@@ -158,4 +157,3 @@ class ProductRepository(BaseRepository[Product]):
         await self.session.delete(db_obj)
         await self.session.commit()
         return True
-    

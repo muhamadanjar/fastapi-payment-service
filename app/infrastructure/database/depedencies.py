@@ -1,67 +1,104 @@
-from typing import AsyncIterator, Generator, Optional
-from .manager import database_manager
+# database/dependencies.py
+from typing import AsyncIterator, Iterator, Optional
 from sqlmodel import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from sqlalchemy.ext.asyncio import (
-    create_async_engine,
-    AsyncSession,
-    async_sessionmaker,
-    AsyncEngine
-)
+from app.infrastructure.database.manager import db_manager
 
 
-def get_db(db_name: Optional[str] = None) -> Generator[Session, None, None]:
-    """FastAPI dependency for getting database session (sync)"""
-    with database_manager.session_scope(db_name) as session:
+# ==================== SYNC DEPENDENCIES ====================
+
+def get_db(db_name: Optional[str] = None) -> Iterator[Session]:
+    """
+    FastAPI dependency for sync database session
+    
+    Usage:
+        @app.get("/items")
+        def get_items(db: Session = Depends(get_db)):
+            ...
+    """
+    with db_manager.session(db_name) as session:
         yield session
 
+
+def get_primary_db() -> Iterator[Session]:
+    """Get primary database session (sync)"""
+    yield from get_db(None)  # ✅ FIX: yield from
+
+
+def get_replica_db() -> Iterator[Session]:
+    """Get replica database session (sync)"""
+    yield from get_db("replica")  # ✅ FIX: yield from
+
+
+def get_analytics_db() -> Iterator[Session]:
+    """Get analytics database session (sync)"""
+    yield from get_db("analytics")  # ✅ FIX: yield from
+
+
+# ==================== ASYNC DEPENDENCIES ====================
 
 async def get_async_db(db_name: Optional[str] = None) -> AsyncIterator[AsyncSession]:
-    """FastAPI dependency for getting database session (async)"""
-    db = database_manager.get_database(db_name)
-    async with db.get_async_session() as session:
+    """
+    FastAPI dependency for async database session
+    
+    Usage:
+        @app.get("/items")
+        async def get_items(db: AsyncSession = Depends(get_async_db)):
+            ...
+    """
+    async with db_manager.async_session(db_name) as session:
         yield session
-
-
-def get_primary_db() -> Generator[Session, None, None]:
-    """Get primary database session"""
-    return get_db(None)
-
-
-def get_replica_db() -> Generator[Session, None, None]:
-    """Get replica database session"""
-    return get_db("replica")
-
-
-def get_analytics_db() -> Generator[Session, None, None]:
-    """Get analytics database session"""
-    return get_db("analytics")
 
 
 async def get_async_primary_db() -> AsyncIterator[AsyncSession]:
-    """Get async primary database session"""
-    return get_async_db(None)
+    """Get primary database session (async)"""
+    async for session in get_async_db(None):  # ✅ FIX: async for
+        yield session
 
 
 async def get_async_replica_db() -> AsyncIterator[AsyncSession]:
-    """Get async replica database session"""
-    return get_async_db("replica")
+    """Get replica database session (async)"""
+    async for session in get_async_db("replica"):  # ✅ FIX: async for
+        yield session
 
 
 async def get_async_analytics_db() -> AsyncIterator[AsyncSession]:
-    """Get async analytics database session"""
-    return get_async_db("analytics")
+    """Get analytics database session (async)"""
+    async for session in get_async_db("analytics"):  # ✅ FIX: async for
+        yield session
 
+
+# ==================== FACTORY FUNCTIONS ====================
 
 def create_db_dependency(db_name: str):
-    """Factory function to create custom database dependency"""
-    def dependency() -> Generator[Session, None, None]:
-        return get_db(db_name)
+    """
+    Factory to create custom sync database dependency
+    
+    Usage:
+        get_cache_db = create_db_dependency("cache")
+        
+        @app.get("/cached")
+        def get_cached(db: Session = Depends(get_cache_db)):
+            ...
+    """
+    def dependency() -> Iterator[Session]:
+        yield from get_db(db_name)  # ✅ FIX: yield from
     return dependency
 
 
 def create_async_db_dependency(db_name: str):
-    """Factory function to create custom async database dependency"""
+    """
+    Factory to create custom async database dependency
+    
+    Usage:
+        get_async_cache_db = create_async_db_dependency("cache")
+        
+        @app.get("/cached")
+        async def get_cached(db: AsyncSession = Depends(get_async_cache_db)):
+            ...
+    """
     async def dependency() -> AsyncIterator[AsyncSession]:
-        return get_async_db(db_name)
+        async for session in get_async_db(db_name):  # ✅ FIX: async for
+            yield session
     return dependency

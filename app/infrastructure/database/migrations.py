@@ -5,8 +5,8 @@ from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
 import os
 import logging
-from app.infrastructure.database.connections import DatabaseConnection, MultiDatabaseManager
-
+from app.infrastructure.database.connections import DatabaseConnection
+from app.infrastructure.database.manager import db_manager, DatabaseManager
 logger = logging.getLogger(__name__)
 
 class AlembicManager:
@@ -125,7 +125,7 @@ class AlembicManager:
 class MultiDatabaseMigrationManager:
     """Manager for migrations across multiple databases"""
     
-    def __init__(self, db_manager: MultiDatabaseManager):
+    def __init__(self, db_manager: DatabaseManager):
         self.db_manager = db_manager
         self._alembic_managers: Dict[str, AlembicManager] = {}
     

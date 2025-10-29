@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.domain.schema.product_schema import ProductResponse
 from app.infrastructure.database.depedencies import (
     get_primary_db,
     get_async_primary_db,
@@ -15,7 +16,7 @@ from app.domain.entity.product import Product
 router = APIRouter(prefix="/products", tags=["Products"])
 
 
-@router.get('/')
+@router.get('/',)
 def get_all(
     skip: int = 0, 
     limit: int = 100,
@@ -25,9 +26,7 @@ def get_all(
     repo = ProductRepository(db)
     result = repo.get_all(skip=skip, limit=limit)
     
-    return {
-        'data': result
-    }
+    return result
 
 
 @router.post("/")

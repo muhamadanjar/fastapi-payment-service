@@ -21,6 +21,16 @@ class Settings(BaseSettings):
     DATABASE: DatabaseSettings = Field(default_factory=DatabaseSettings)
     CORS:Optional[CORSSettings] = Field(default=None,)
 
+    LOG_LEVEL: str = Field(default="INFO")
+    LOG_FILE: str = Field(default="payment.log")
+    LOG_FORMAT: str = Field(default="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    LOG_DATE_FORMAT: str = Field(default="%Y-%m-%d %H:%M:%S")
+    LOG_MAX_BYTES: int = Field(default=10485760)
+    LOG_BACKUP_COUNT: int = Field(default=5)
+    LOG_ENCODING: str = Field(default="utf-8")
+    LOG_ENABLE_JSON: bool = Field(default=False)
+    LOG_ENABLE_CONSOLE: bool = Field(default=True)
+
     model_config = SettingsConfigDict(
         env_file=str(BASE_DIR / ".env"), 
         extra="allow", 

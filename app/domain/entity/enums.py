@@ -10,6 +10,7 @@ class MethodType(str, Enum):
     QRIS = "qris"
     RETAIL = "retail"
 
+
 class GatewayType(str, Enum):
     MIDTRANS = "midtrans"
     XENDIT = "xendit"
@@ -17,9 +18,11 @@ class GatewayType(str, Enum):
     NICEPAY = "nicepay"
     FASPAY = "faspay"
 
+
 class AdminFeeType(str, Enum):
     FIXED = "fixed"
     PERCENTAGE = "percentage"
+
 
 class VoucherType(str, Enum):
     PUBLIC = "public"
@@ -27,9 +30,11 @@ class VoucherType(str, Enum):
     REFERRAL = "referral"
     CASHBACK = "cashback"
 
+
 class DiscountType(str, Enum):
     FIXED = "fixed"
     PERCENTAGE = "percentage"
+
 
 class TransactionStatus(str, Enum):
     PENDING = "pending"
@@ -41,6 +46,7 @@ class TransactionStatus(str, Enum):
     FAILED = "failed"
     REFUNDED = "refunded"
 
+
 class ConditionType(str, Enum):
     MIN_AMOUNT = "min_amount"
     MAX_AMOUNT = "max_amount"
@@ -48,6 +54,7 @@ class ConditionType(str, Enum):
     CATEGORY_ID = "category_id"
     USER_SEGMENT = "user_segment"
     PAYMENT_METHOD = "payment_method"
+
 
 class OperatorType(str, Enum):
     EQUAL = "equal"
@@ -57,17 +64,20 @@ class OperatorType(str, Enum):
     IN = "in"
     NOT_IN = "not_in"
 
+
 class ChangedBy(str, Enum):
     SYSTEM = "system"
     USER = "user"
     GATEWAY = "gateway"
     ADMIN = "admin"
 
+
 class RequestType(str, Enum):
     CREATE_PAYMENT = "create_payment"
     CHECK_STATUS = "check_status"
     CANCEL_PAYMENT = "cancel_payment"
     REFUND = "refund"
+
 
 class CallbackType(str, Enum):
     PAYMENT_NOTIFICATION = "payment_notification"

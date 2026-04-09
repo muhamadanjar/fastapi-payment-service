@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, Column, JSON
+from sqlmodel import SQLModel, Field, Column, JSON, text
 from datetime import datetime
 from typing import Optional
 from enum import Enum
@@ -9,7 +9,9 @@ from app.domain.entity.enums import CallbackType, RequestType
 class PaymentGatewayRequest(SQLModel, table=True):
     __tablename__ = "payment_gateway_requests"
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
+        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+    )
     transaction_id: str = Field(foreign_key="transactions.id", max_length=36, index=True)
     gateway_id: str = Field(foreign_key="payment_gateways.id", max_length=36, index=True)
     request_type: RequestType
@@ -30,7 +32,9 @@ class PaymentGatewayRequest(SQLModel, table=True):
 class PaymentGatewayCallback(SQLModel, table=True):
     __tablename__ = "payment_gateway_callbacks"
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
+        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+    )
     transaction_id: str = Field(foreign_key="transactions.id", max_length=36, index=True)
     gateway_id: str = Field(foreign_key="payment_gateways.id", max_length=36, index=True)
     callback_type: CallbackType

@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, Column, JSON
+from sqlmodel import SQLModel, Field, Column, JSON, text
 from datetime import datetime
 from typing import Optional
 from enum import Enum
@@ -8,7 +8,9 @@ import uuid
 class ProductCategory(SQLModel, table=True):
     __tablename__ = "product_categories"
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, sa_column_kwargs={
+        "server_default": text("uuid_generate_v4()")
+    })
     category_name: str = Field(max_length=255)
     description: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -18,7 +20,9 @@ class ProductCategory(SQLModel, table=True):
 class Product(SQLModel, table=True):
     __tablename__ = "products"
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
+        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+    )
     application_id: str = Field(max_length=36, index=True)
     category_id: Optional[str] = Field(default=None, foreign_key="product_categories.id", max_length=36, index=True)
     product_code: str = Field(max_length=100, index=True)

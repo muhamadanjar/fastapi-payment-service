@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, Column, JSON
+from sqlmodel import SQLModel, Field, Column, JSON, text
 from datetime import datetime
 from typing import Optional
 from enum import Enum
@@ -9,7 +9,9 @@ from app.domain.entity.enums import AdminFeeType, GatewayType, MethodType
 class PaymentMethod(SQLModel, table=True):
     __tablename__ = "payment_methods"
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
+        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+    )
     method_code: str = Field(unique=True, max_length=100, index=True)
     method_name: str = Field(max_length=255)
     method_type: MethodType
@@ -25,7 +27,9 @@ class PaymentMethod(SQLModel, table=True):
 class PaymentGateway(SQLModel, table=True):
     __tablename__ = "payment_gateways"
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
+        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+    )
     gateway_code: str = Field(unique=True, max_length=100, index=True)
     gateway_name: str = Field(max_length=255)
     gateway_type: GatewayType
@@ -41,7 +45,9 @@ class PaymentGateway(SQLModel, table=True):
 class PaymentGatewayCredential(SQLModel, table=True):
     __tablename__ = "payment_gateway_credentials"
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
+        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+    )
     application_id: str = Field(max_length=36, index=True)
     gateway_id: str = Field(foreign_key="payment_gateways.id", max_length=36, index=True)
     merchant_id: Optional[str] = Field(default=None, max_length=255)
@@ -58,7 +64,9 @@ class PaymentGatewayCredential(SQLModel, table=True):
 class PaymentMethodGateway(SQLModel, table=True):
     __tablename__ = "payment_method_gateways"
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
+        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+    )
     payment_method_id: str = Field(foreign_key="payment_methods.id", max_length=36, index=True)
     gateway_id: str = Field(foreign_key="payment_gateways.id", max_length=36, index=True)
     gateway_method_code: str = Field(max_length=100)

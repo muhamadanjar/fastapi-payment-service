@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, Column, JSON
+from sqlmodel import SQLModel, Field, Column, JSON, text
 from datetime import datetime
 from typing import Optional
 from enum import Enum
@@ -9,7 +9,9 @@ from app.domain.entity.enums import ConditionType, DiscountType, OperatorType, V
 class Voucher(SQLModel, table=True):
     __tablename__ = "vouchers"
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
+        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+    )
     application_id: str = Field(max_length=36, index=True)
     voucher_code: str = Field(unique=True, max_length=100, index=True)
     voucher_name: str = Field(max_length=255)

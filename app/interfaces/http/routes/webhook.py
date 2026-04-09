@@ -1,24 +1,27 @@
+from fastapi import APIRouter
 
-from fastapi import APIRouter, Depends
-from sqlmodel import Session
+# Public callback endpoints from payment gateways.
+callback_router = APIRouter()
 
-
-
-router = APIRouter()
-
-@router.post('/payment/{gateway_code}')
-def payment(gateway_code):
-    return []
-
-@router.post('/payment/test')
-def test():
-    return []
-
-@router.post('/logs')
-def logs():
-    return []
+# Internal webhook management endpoints.
+management_router = APIRouter()
 
 
-@router.post('/payment/{id}/retry')
-def webhook_retry(id: str):
-    return []
+@callback_router.post("/payment/{gateway_code}")
+async def payment(gateway_code: str):
+    return {"message": "accepted", "gateway_code": gateway_code}
+
+
+@callback_router.post("/test")
+async def test():
+    return {"message": "webhook test accepted"}
+
+
+@management_router.get("/logs")
+async def logs():
+    return {"data": []}
+
+
+@management_router.post("/{id}/retry")
+async def webhook_retry(id: str):
+    return {"message": "retry requested", "webhook_id": id}

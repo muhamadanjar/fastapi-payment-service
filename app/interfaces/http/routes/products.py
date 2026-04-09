@@ -3,12 +3,13 @@ from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
 
 from app.infrastructure.database.depedencies import (
     get_async_primary_db,
 )
 from app.infrastructure.database.repositories.product import ProductRepository
-from app.domain.entity.product import Product
+from app.domain.entity.product import Product, ProductCategory
 from app.domain.schema.product_schema import ProductCreate, ProductResponse, ProductUpdate
 
 router = APIRouter(tags=["Products"])
@@ -50,6 +51,17 @@ async def get_all(
         "data": [ProductResponse.model_validate(item) for item in result["data"]],
         "meta": result["metas"],
     }
+
+
+@router.get("/categories")
+async def get_product_categories(
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_async_primary_db),
+):
+    statement = select(ProductCategory).offset(skip).limit(limit)
+    result = await db.execute(statement)
+    return {"data": result.scalars().all()}
 
 
 @router.get("/{product_id}", response_model=ProductResponse)

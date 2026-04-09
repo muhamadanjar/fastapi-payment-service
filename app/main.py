@@ -5,9 +5,11 @@ from fastapi import FastAPI
 from app.config.database import AnalyticsSettings, DatabaseSettings, ReplicaSettings
 from app.infrastructure.database.manager import db_manager
 from app.interfaces.http.routes import api_router as app_router
+from app.interfaces.http.routes import public_router
 
 # Import all models so SQLModel metadata registers all tables
 import app.domain.entity.enums  # noqa: F401
+import app.domain.entity.application  # noqa: F401
 import app.domain.entity.product  # noqa: F401
 import app.domain.entity.payments  # noqa: F401
 import app.domain.entity.transactions  # noqa: F401
@@ -63,3 +65,4 @@ app = FastAPI(
 )
 
 app.include_router(app_router)
+app.include_router(public_router)

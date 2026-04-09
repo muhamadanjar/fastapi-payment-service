@@ -1,5 +1,11 @@
 # Payment Service
 
+## Main Documentation
+
+Gunakan panduan utama di:
+
+- `documentation.md` (step-by-step setup, runtime flow, endpoint map, operasi webhook/gateway)
+
 ## Development
 ### Migrate
 ```bash

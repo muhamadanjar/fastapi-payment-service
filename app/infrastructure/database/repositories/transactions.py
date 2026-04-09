@@ -15,3 +15,13 @@ class TransactionRepository(BaseSQLRepository[TransactionModel, TransactionEntit
         statement = select(self.model_cls).where(self.model_cls.invoice_number == invoice_number)
         result = await self.session.exec(statement)
         return self.to_domain(result.first())
+
+    async def get_by_transaction_code(self, transaction_code: str) -> TransactionEntity | None:
+        statement = select(self.model_cls).where(self.model_cls.transaction_code == transaction_code)
+        result = await self.session.exec(statement)
+        return self.to_domain(result.first())
+
+    async def get_by_payment_reference(self, payment_reference: str) -> TransactionEntity | None:
+        statement = select(self.model_cls).where(self.model_cls.payment_reference == payment_reference)
+        result = await self.session.exec(statement)
+        return self.to_domain(result.first())

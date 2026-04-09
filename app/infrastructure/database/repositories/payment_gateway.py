@@ -26,6 +26,11 @@ class PaymentGatewayRepository(BaseSQLRepository[PaymentGatewayModel, PaymentGat
         result = await self.session.exec(statement)
         return self.to_domain(result.all())
 
+    async def get_by_code(self, gateway_code: str) -> PaymentGatewayEntity | None:
+        statement = select(self.model_cls).where(self.model_cls.gateway_code == gateway_code)
+        result = await self.session.exec(statement)
+        return self.to_domain(result.first())
+
 
 class PaymentGatewayCredentialRepository(
     BaseSQLRepository[PaymentGatewayCredentialModel, PaymentGatewayCredentialEntity]
@@ -41,6 +46,19 @@ class PaymentGatewayCredentialRepository(
         statement = select(self.model_cls).where(self.model_cls.application_id == application_id)
         result = await self.session.exec(statement)
         return self.to_domain(result.all())
+
+    async def get_active_credential(
+        self,
+        application_id: str,
+        gateway_id: str,
+    ) -> PaymentGatewayCredentialEntity | None:
+        statement = select(self.model_cls).where(
+            self.model_cls.application_id == application_id,
+            self.model_cls.gateway_id == gateway_id,
+            self.model_cls.is_active == True,  # noqa: E712
+        )
+        result = await self.session.exec(statement)
+        return self.to_domain(result.first())
 
 
 class PaymentGatewayRequestRepository(BaseSQLRepository[PaymentGatewayRequestModel, PaymentGatewayRequestEntity]):

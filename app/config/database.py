@@ -3,7 +3,6 @@ from enum import Enum
 from typing import Optional
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-import os
 
 class DatabaseType(str, Enum):
     POSTGRESQL = "postgresql"
@@ -26,8 +25,8 @@ class DatabaseSettings(BaseSettings):
     host: str = Field(default="localhost")
     port: int = Field(default=5432)
     user: str = Field(default="postgres")
-    password: str = Field(default=os.environ.get('DB_PASSWORD'))
-    name: str = Field(default=os.environ.get('DB_NAME'))
+    password: str = Field(default="postgres")
+    name: str = Field(default="fastapi_payment")
     
     # SQLite specific
     path: Optional[str] = Field(default="./app.db")

@@ -3,7 +3,6 @@ from alembic import command
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
-import os
 import logging
 from app.infrastructure.database.connections import DatabaseConnection
 from app.infrastructure.database.manager import db_manager, DatabaseManager
@@ -27,8 +26,8 @@ class AlembicManager:
         self.alembic_cfg = Config(self.alembic_ini_path)
         # Override sqlalchemy.url with current database URL
         self.alembic_cfg.set_main_option(
-            "sqlalchemy.url", 
-            self.db_connection.config.get_url()
+            "sqlalchemy.url",
+            self.db_connection.settings.build_url()
         )
         logger.info(f"Alembic initialized for database '{self.db_connection.name}'")
     
@@ -38,7 +37,7 @@ class AlembicManager:
             self.alembic_cfg = Config()
             self.alembic_cfg.set_main_option(
                 "sqlalchemy.url",
-                self.db_connection.config.get_url()
+                self.db_connection.settings.build_url()
             )
         
         command.init(self.alembic_cfg, directory)
@@ -135,7 +134,7 @@ class MultiDatabaseMigrationManager:
         alembic_ini_path: Optional[str] = None
     ) -> AlembicManager:
         """Add Alembic configuration for a specific database"""
-        db_connection = self.db_manager.get_database(db_name)
+        db_connection = self.db_manager.get(db_name)
         
         if alembic_ini_path is None:
             alembic_ini_path = f"alembic_{db_name}.ini"
@@ -148,7 +147,7 @@ class MultiDatabaseMigrationManager:
     def get_migration_manager(self, db_name: Optional[str] = None) -> AlembicManager:
         """Get Alembic manager for a specific database"""
         if db_name is None:
-            db_name = self.db_manager._primary_db
+            db_name = self.db_manager._primary_name
         
         if db_name not in self._alembic_managers:
             return self.add_migration_config(db_name)

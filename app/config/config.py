@@ -4,6 +4,7 @@ from pydantic import EmailStr, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.config.cors import CORSSettings
+from app.config.rate_limit import RateLimitSettings
 from .database import DatabaseSettings
 from pathlib import Path
 
@@ -19,7 +20,8 @@ class Settings(BaseSettings):
     DESCRIPTION: str = "FastAPI payment"
 
     DATABASE: DatabaseSettings = Field(default_factory=DatabaseSettings)
-    CORS:Optional[CORSSettings] = Field(default=None,)
+    CORS: Optional[CORSSettings] = Field(default=None)
+    RATE_LIMIT: Optional[RateLimitSettings] = Field(default_factory=RateLimitSettings)
 
     LOG_LEVEL: str = Field(default="INFO")
     LOG_FILE: str = Field(default="payment.log")

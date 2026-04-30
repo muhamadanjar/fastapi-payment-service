@@ -3,9 +3,11 @@ import os
 import logging
 from fastapi import FastAPI
 from app.config.database import AnalyticsSettings, DatabaseSettings, ReplicaSettings
+from app.config.rate_limit import RateLimitSettings
 from app.infrastructure.database.manager import db_manager
 from app.interfaces.http.routes import api_router as app_router
 from app.interfaces.http.routes import public_router
+from app.interfaces.http.middleware.rate_limit import RateLimitMiddleware
 
 # Import all models so SQLModel metadata registers all tables
 import app.domain.entity.enums  # noqa: F401
@@ -63,6 +65,8 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+app.add_middleware(RateLimitMiddleware, settings=RateLimitSettings())
 
 app.include_router(app_router)
 app.include_router(public_router)

@@ -28,3 +28,23 @@ class BadRequestError(AppException):
     """Exception raised for invalid request parameters."""
     def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
         super().__init__(message=message, status_code=HTTP_400_BAD_REQUEST, details=details)
+
+
+class ETLException(AppException):
+    pass
+
+
+class FileProcessingException(AppException):
+    pass
+
+
+class DataQualityException(AppException):
+    pass
+
+
+class AuthenticationException(AppException):
+    pass
+
+
+class AuthorizationException(AppException):
+    pass

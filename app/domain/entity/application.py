@@ -11,7 +11,7 @@ class Application(SQLModel, table=True):
         default_factory=lambda: str(uuid.uuid4()),
         primary_key=True,
         max_length=36,
-        sa_column_kwargs={"server_default": text("uuid_generate_v4()")},
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")},
     )
     app_name: str = Field(max_length=255, index=True)
     app_key: str = Field(max_length=255, unique=True, index=True)

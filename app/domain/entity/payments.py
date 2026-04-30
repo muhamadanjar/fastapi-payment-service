@@ -10,7 +10,7 @@ class PaymentMethod(SQLModel, table=True):
     __tablename__ = "payment_methods"
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
-        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")}
     )
     method_code: str = Field(unique=True, max_length=100, index=True)
     method_name: str = Field(max_length=255)
@@ -28,7 +28,7 @@ class PaymentGateway(SQLModel, table=True):
     __tablename__ = "payment_gateways"
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
-        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")}
     )
     gateway_code: str = Field(unique=True, max_length=100, index=True)
     gateway_name: str = Field(max_length=255)
@@ -46,7 +46,7 @@ class PaymentGatewayCredential(SQLModel, table=True):
     __tablename__ = "payment_gateway_credentials"
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
-        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")}
     )
     application_id: str = Field(max_length=36, index=True)
     gateway_id: str = Field(foreign_key="payment_gateways.id", max_length=36, index=True)
@@ -65,7 +65,7 @@ class PaymentMethodGateway(SQLModel, table=True):
     __tablename__ = "payment_method_gateways"
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
-        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")}
     )
     payment_method_id: str = Field(foreign_key="payment_methods.id", max_length=36, index=True)
     gateway_id: str = Field(foreign_key="payment_gateways.id", max_length=36, index=True)

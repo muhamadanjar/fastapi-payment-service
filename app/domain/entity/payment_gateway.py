@@ -10,7 +10,7 @@ class PaymentGatewayRequest(SQLModel, table=True):
     __tablename__ = "payment_gateway_requests"
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
-        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")}
     )
     transaction_id: str = Field(foreign_key="transactions.id", max_length=36, index=True)
     gateway_id: str = Field(foreign_key="payment_gateways.id", max_length=36, index=True)
@@ -33,7 +33,7 @@ class PaymentGatewayCallback(SQLModel, table=True):
     __tablename__ = "payment_gateway_callbacks"
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
-        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")}
     )
     transaction_id: str = Field(foreign_key="transactions.id", max_length=36, index=True)
     gateway_id: str = Field(foreign_key="payment_gateways.id", max_length=36, index=True)

@@ -10,7 +10,7 @@ class Voucher(SQLModel, table=True):
     __tablename__ = "vouchers"
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
-        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")}
     )
     application_id: str = Field(max_length=36, index=True)
     voucher_code: str = Field(unique=True, max_length=100, index=True)

@@ -9,7 +9,7 @@ class ProductCategory(SQLModel, table=True):
     __tablename__ = "product_categories"
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, sa_column_kwargs={
-        "server_default": text("uuid_generate_v4()")
+        "server_default": text("gen_random_uuid()")
     })
     category_name: str = Field(max_length=255)
     description: Optional[str] = None
@@ -21,7 +21,7 @@ class Product(SQLModel, table=True):
     __tablename__ = "products"
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, max_length=36, 
-        sa_column_kwargs={"server_default": text("uuid_generate_v4()")}
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")}
     )
     application_id: str = Field(max_length=36, index=True)
     category_id: Optional[str] = Field(default=None, foreign_key="product_categories.id", max_length=36, index=True)

@@ -36,64 +36,73 @@ class DatabaseConnection:
         # State
         self._is_connected = False
     
-    def _get_engine_config(self, url: str) -> dict:
-        """Get engine configuration based on database type"""
+    def _get_sync_engine_config(self, url: str) -> dict:
+        """Build kwargs for sync engine (psycopg2/pymysql)."""
         config = {
             "echo": self.settings.echo,
             "pool_pre_ping": True,
         }
-        
-        # SQLite uses different pooling strategy
         if "sqlite" in url:
             config["connect_args"] = self.settings.get_connect_args()
-            if ":memory:" in url:
-                config["poolclass"] = StaticPool
-            else:
-                config["poolclass"] = NullPool
+            config["poolclass"] = StaticPool if ":memory:" in url else NullPool
         else:
-            # PostgreSQL, MySQL, MariaDB
             config.update({
                 "pool_size": self.settings.pool_size,
                 "max_overflow": self.settings.max_overflow,
                 "pool_timeout": self.settings.pool_timeout,
                 "pool_recycle": self.settings.pool_recycle,
                 "poolclass": QueuePool,
-                "connect_args": self.settings.get_connect_args(),
+                "connect_args": self.settings.get_connect_args(),  # connect_timeout for psycopg2/pymysql
             })
-        
         return config
-    
+
+    def _get_async_engine_config(self, url: str) -> dict:
+        """Build kwargs for async engine (asyncpg/aiomysql — no poolclass)."""
+        config = {
+            "echo": self.settings.echo,
+            "pool_pre_ping": True,
+        }
+        if "sqlite" in url:
+            pass  # aiosqlite does not support pool_size/max_overflow
+        else:
+            connect_timeout = getattr(self.settings, "connect_timeout", 10)
+            config.update({
+                "pool_size": self.settings.pool_size,
+                "max_overflow": self.settings.max_overflow,
+                "pool_timeout": self.settings.pool_timeout,
+                "pool_recycle": self.settings.pool_recycle,
+            })
+            if "postgresql" in url:
+                config["connect_args"] = {"timeout": connect_timeout}  # asyncpg
+            elif "mysql" in url:
+                config["connect_args"] = {"connect_timeout": connect_timeout}  # aiomysql
+        return config
+
     @property
     def engine(self) -> Engine:
         """Get or create synchronous engine"""
         if self._engine is None:
             url = self.settings.build_url(is_async=False)
-            config = self._get_engine_config(url)
-            self._engine = create_engine(url, **config)
+            self._engine = create_engine(url, **self._get_sync_engine_config(url))
             logger.info(f"[{self.name}] Sync engine created")
         return self._engine
-    
+
     @property
     def async_engine(self) -> AsyncEngine:
         """Get or create asynchronous engine"""
         if not self.settings.enable_async:
             raise RuntimeError(f"Async not enabled for database '{self.name}'")
-        
+
         if self._async_engine is None:
             url = self.settings.build_url(is_async=True)
-            config = self._get_engine_config(url)
-            
-            # Remove sync-specific poolclass
-            config.pop("poolclass", None)
-            
-            self._async_engine = create_async_engine(url, **config)
+            self._async_engine = create_async_engine(url, **self._get_async_engine_config(url))
             self._async_session_maker = async_sessionmaker(
                 self._async_engine,
                 class_=AsyncSession,
                 expire_on_commit=False
             )
             logger.info(f"[{self.name}] Async engine created")
-        
+
         return self._async_engine
     
     @contextmanager

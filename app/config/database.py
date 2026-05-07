@@ -43,7 +43,7 @@ class DatabaseSettings(BaseSettings):
     charset: str = Field(default="utf8mb4")
     
     # Async support
-    enable_async: bool = Field(default=False)
+    enable_async: bool = Field(default=True)
     
     @field_validator("port")
     @classmethod

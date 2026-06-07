@@ -152,3 +152,9 @@ Endpoints in `/api/admin/` for:
 - Reconciliation reports
 
 See `documentation.md` section 6.7 for full admin endpoint list.
+
+## Rules
+
+- **Commits are FORBIDDEN** — Claude must NOT run `git commit` under any circumstances
+- **Git read-only** — Only these operations are allowed: `git log`, `git status`, `git diff`, `git show`
+- **FORBIDDEN: `git commit`, `git push`, `git merge`, `git rebase`, `git reset`** — all git write operations are prohibited

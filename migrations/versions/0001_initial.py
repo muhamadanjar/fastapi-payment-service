@@ -1,7 +1,7 @@
 """initial
 
-Revision ID: c5c1cb5b9c96
-Revises: 
+Revision ID: 0001_initial
+Revises:
 Create Date: 2025-10-06 16:34:14.622407
 
 """
@@ -13,7 +13,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c5c1cb5b9c96'
+revision: str = '0001_initial'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

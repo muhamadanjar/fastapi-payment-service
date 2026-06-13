@@ -83,35 +83,36 @@ class BaseSQLRepository(IRepository[E], Generic[M, E]):
     
     def _get_cleaned_data(self, data: dict[str, Any]) -> dict[str, Any]:
         """
-        Filter out None values for relationship fields that are collections
-        to avoid "Incompatible collection type: None is not list-like" errors.
+        Filter out ALL relationship fields to prevent incomplete objects from reaching SQLAlchemy.
+        Relationships must be set explicitly via FKs or dedicated sync methods.
         """
         try:
             mapper = sa_inspect(self.model_cls)
             relationship_keys = mapper.relationships.keys()
-            
-            filtered_data = {}
-            for k, v in data.items():
-                if k in relationship_keys:
-                    rel = mapper.relationships[k]
-                    # If it's a collection (uselist=True) and value is None, skip it
-                    if rel.uselist and v is None:
-                        continue
-                filtered_data[k] = v
+            # Skip all relationship fields — they cannot be set from DTOs
+            filtered_data = {k: v for k, v in data.items() if k not in relationship_keys}
             return filtered_data
         except Exception:
             # Fallback for non-inspected models or other errors
             return data
 
     def to_model(self, entity: E) -> M:
-        """Convert Domain Entity to DB Model"""
+        """Convert Domain Entity to DB Model. Excludes relationships to avoid incomplete objects."""
         if isinstance(entity, dict):
             data = entity
         elif hasattr(entity, 'model_dump'):
-            data = entity.model_dump()
+            data = entity.model_dump(exclude_unset=True)
         else:
             data = entity.dict()
-            
+
+        # Filter out relationships — they must be set explicitly via FKs, not from entity data
+        try:
+            mapper = sa_inspect(self.model_cls)
+            relationship_keys = set(mapper.relationships.keys())
+            data = {k: v for k, v in data.items() if k not in relationship_keys}
+        except Exception:
+            pass
+
         cleaned_data = self._get_cleaned_data(data)
         return self.model_cls(**cleaned_data)
     

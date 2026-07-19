@@ -1,5 +1,6 @@
 from datetime import datetime
 import hashlib
+import hmac
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -28,7 +29,12 @@ async def payment(
     request: Request,
     db: AsyncSession = Depends(get_async_primary_db),
 ):
-    payload = await request.json()
+    try:
+        payload = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON body")
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=400, detail="Payload must be a JSON object")
     gateway_repo = PaymentGatewayRepository(db)
     callback_repo = PaymentGatewayCallbackRepository(db)
     credential_repo = PaymentGatewayCredentialRepository(db)
@@ -72,7 +78,7 @@ async def payment(
             is_signature_valid = (signature or "").lower() == expected.lower()
         elif "xendit" in gateway_code_lower and credential.webhook_secret:
             callback_token = request.headers.get("x-callback-token", "")
-            is_signature_valid = callback_token == credential.webhook_secret
+            is_signature_valid = hmac.compare_digest(callback_token, credential.webhook_secret or "")
 
     callback = PaymentGatewayCallback(
         transaction_id=transaction.id,
@@ -142,12 +148,6 @@ async def payment(
     await db.commit()
 
     return {"message": "accepted", "gateway_code": gateway_code, "transaction_id": transaction.id}
-
-
-@callback_router.post("/test")
-async def test(request: Request):
-    payload = await request.json()
-    return {"message": "webhook test accepted", "payload": payload}
 
 
 @management_router.get("/logs")

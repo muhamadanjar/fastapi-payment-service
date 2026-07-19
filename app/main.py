@@ -2,8 +2,10 @@ from contextlib import asynccontextmanager
 import os
 import logging
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.config.database import AnalyticsSettings, DatabaseSettings, ReplicaSettings
 from app.config.rate_limit import RateLimitSettings
+from app.config.cors import CORSSettings
 from app.infrastructure.database.manager import db_manager
 from app.interfaces.http.routes import api_router as app_router
 from app.interfaces.http.routes import public_router
@@ -64,6 +66,17 @@ app = FastAPI(
     description="Payment system with multi-database support",
     version="1.0.0",
     lifespan=lifespan
+)
+
+# CORS — origins/methods/headers/credentials come from CORSSettings (env-driven,
+# defensive defaults: empty origin list, credentials disabled).
+_cors = CORSSettings()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_cors.allowed_origins,
+    allow_methods=_cors.allowed_methods,
+    allow_headers=_cors.allowed_headers,
+    allow_credentials=_cors.allow_credentials,
 )
 
 app.add_middleware(RateLimitMiddleware, settings=RateLimitSettings())

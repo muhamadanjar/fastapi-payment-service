@@ -39,9 +39,13 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.counter = SlidingWindowCounter()
 
     def _get_client_ip(self, request: Request) -> str:
-        if x_forwarded_for := request.headers.get("x-forwarded-for"):
-            return x_forwarded_for.split(",")[0].strip()
-        return request.client.host if request.client else "unknown"
+        peer = request.client.host if request.client else "unknown"
+        # Only trust X-Forwarded-For when the immediate peer is a configured proxy.
+        trusted = {t.strip() for t in (self.settings.trusted_proxies or "").split(",") if t.strip()}
+        if trusted and peer in trusted:
+            if x_forwarded_for := request.headers.get("x-forwarded-for"):
+                return x_forwarded_for.split(",")[0].strip()
+        return peer
 
     def _get_tier(self, path: str, method: str) -> str:
         if path.startswith("/webhook/payment/"):

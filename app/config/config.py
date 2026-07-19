@@ -11,8 +11,6 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-print("BASE DIR", BASE_DIR)
-
 class Settings(BaseSettings):
     # Project
     PROJECT_NAME: str = Field(default="FastAPI Payment")

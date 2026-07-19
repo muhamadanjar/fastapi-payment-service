@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from app.core.auth import get_current_user, require_roles
 from .health import router as health_router
 from .admin_config import router as admin_config_router
 from .products import router as product_router
@@ -11,7 +12,8 @@ from .voucher import router as voucher_router
 from .webhook import callback_router as webhook_callback_router
 from .webhook import management_router as webhook_management_router
 
-api_router = APIRouter(prefix="/api")
+# All /api/* endpoints require a valid authenticated principal.
+api_router = APIRouter(prefix="/api", dependencies=[Depends(get_current_user)])
 public_router = APIRouter()
 
 # Include all routers with prefixes

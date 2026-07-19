@@ -3,6 +3,7 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.auth import require_roles
 from app.domain.entity.payments import PaymentGatewayCredential
 from app.domain.schema.payment_gateway_schema import (
     PaymentGatewayCredentialCreateRequest,
@@ -17,8 +18,9 @@ from app.infrastructure.database.repositories.payment_gateway import (
     PaymentGatewayRequestRepository,
 )
 
-gateway_router = APIRouter()
-gateway_request_router = APIRouter()
+# Admin-only: gateway config + credential management.
+gateway_router = APIRouter(dependencies=[Depends(require_roles())])
+gateway_request_router = APIRouter(dependencies=[Depends(require_roles())])
 
 
 @gateway_router.get("/gateways")

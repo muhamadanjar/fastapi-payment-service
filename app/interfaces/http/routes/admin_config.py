@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.auth import require_roles
 from app.domain.entity.transactions import Transaction
 from app.domain.entity.voucher import VoucherEligibleUser
 from app.domain.schema.admin_schema import (
@@ -23,7 +24,8 @@ from app.infrastructure.database.repositories.voucher import (
     VoucherRepository,
 )
 
-router = APIRouter()
+# Admin-only: all routes here require an administrative role (ADMIN_ROLES env).
+router = APIRouter(dependencies=[Depends(require_roles())])
 
 
 @router.get("/applications")
